@@ -1,0 +1,26 @@
+http:
+  middlewares:
+    nc-secure-headers:
+      headers:
+        hostsProxyHeaders:
+          - X-Forwarded-Host
+        referrerPolicy: same-origin
+        customResponseHeaders:
+          X-Robots-Tag: 'none'
+
+    nc-redirect:
+      redirectRegex:
+        permanent: true
+        regex: ^https://(.*)/.well-known/(card|cal)dav
+        replacement: https://${1}/remote.php/dav/
+
+    sts-header:
+      headers:
+        stsSeconds: 155520011
+        stsIncludeSubdomains: true
+        stsPreload: true
+
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50

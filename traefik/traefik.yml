@@ -1,0 +1,43 @@
+api:
+  dashboard: true
+
+log:
+  #level: DEBUG
+
+providers:
+  docker:
+    exposedByDefault: false
+    watch: true
+  file:
+    directory: /rules
+    watch: true
+
+entryPoints:
+  web:
+    address: ':80'
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ':443'
+    http:
+      middlewares:
+        - sts-header@file
+      tls:
+        certResolver: dns-regru
+        domains:
+          - main: "bedlamzd.dev"
+            sans:
+              - "*.bedlamzd.dev"
+
+certificatesResolvers:
+  dns-regru:
+    acme:
+      email: bedlamzd@gmail.com
+      storage: /letsencrypt/acme-dns-regru.json
+      dnsChallenge:
+        provider: regru
+        delayBeforeCheck: 60s

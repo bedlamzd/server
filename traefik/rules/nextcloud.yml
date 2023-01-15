@@ -1,0 +1,10 @@
+http:
+  routers:
+    nc-dev-rtr:
+      entryPoints:
+        - web
+        - websecure
+      rule: Host(`cloud.bedlamzd.dev`)
+      service: nc-svc@docker
+      middlewares:
+        - chain-nc 

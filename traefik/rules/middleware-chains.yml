@@ -1,0 +1,9 @@
+http:
+  middlewares:
+    chain-nc:
+      chain:
+        middlewares:
+          - rate-limit
+          - nc-redirect
+          - nc-secure-headers
+          - sts-header

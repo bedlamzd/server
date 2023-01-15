@@ -1,0 +1,67 @@
+version: '3.3'
+
+networks:
+  reproxy:
+    external: true
+
+secrets:
+  cron_token:
+    file: ./.secrets/cron_token
+  app_key:
+    file: ./.secrets/app_key
+  db_name:
+    file: ./.secrets/db_name
+  db_user:
+    file: ./.secrets/db_user
+  db_pwd:
+    file: ./.secrets/db_pwd
+
+services:
+  app:
+    image: fireflyiii/core:latest
+    restart: always
+    volumes:
+      - firefly_iii_upload:/var/www/html/storage/upload
+    env_file: .env
+    labels:
+      traefik.enable: true
+      traefik.docker.network: reproxy
+      traefik.http.services.firefly-svc.loadbalancer.server.port: 8080
+    depends_on:
+      - db
+    secrets:
+      # used in .env file
+      - app_key
+      - cron_token
+      - db_name
+      - db_user
+      - db_pwd
+    networks:
+      - default
+      - reproxy
+  db:
+    image: mariadb    
+    hostname: fireflyiiidb
+    restart: always
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER_FILE=/run/secrets/db_user
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_pwd
+      - MYSQL_DATABASE_FILE=/run/secrets/db_name
+    volumes:
+      - firefly_iii_db:/var/lib/mysql
+    secrets:   
+      - db_name
+      - db_user
+      - db_pwd
+
+  cron:
+    image: alpine
+    command: sh -c "echo \"0 3 * * * wget -q0- http://app:8080/api/v1/cron/$(cat /run/secrets/cron_token)\" | crontab - && crond -f -L /dev/stdout" 
+    secrets:
+      - cron_token
+
+volumes:
+   firefly_iii_upload:
+   firefly_iii_db:
+

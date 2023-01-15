@@ -1,0 +1,14 @@
+http:
+  routers:
+    ko-front-rtr:
+      entryPoints:
+        - web
+        - websecure
+      rule: Host(`food.bedlamzd.dev`)
+      service: kitchenowl-front-svc@docker
+    ko-back-rtr:
+      entryPoints:
+        - web
+        - websecure
+      rule: Host(`backend-food.bedlamzd.dev`)
+      service: kitchenowl-back-svc@docker

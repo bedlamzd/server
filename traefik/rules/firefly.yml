@@ -1,0 +1,9 @@
+http:
+  routers:
+    firefly-rtr:
+      entryPoints:
+        - web
+        - websecure
+      rule: Host(`money.bedlamzd.dev`)
+      service: firefly-svc@docker
+

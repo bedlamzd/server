@@ -1,0 +1,14 @@
+http:
+  routers:
+    main-page-router:
+      entryPoints:
+        - web
+        - websecure
+      rule: Host(`bedlamzd.dev`)
+      service: noop@internal
+      tls:
+        certResolver: dns-regru
+        domains:
+          - main: "bedlamzd.dev"
+            sans: 
+              - "*.bedlamzd.dev"
