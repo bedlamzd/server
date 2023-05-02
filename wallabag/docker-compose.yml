@@ -1,0 +1,52 @@
+version: '3'
+
+networks:
+  reproxy:
+    external: true
+
+volumes:
+  images:
+  db:
+
+services:
+  wallabag:
+    image: wallabag/wallabag
+    restart: always
+    env_file: 
+      - .secrets/db-root.env
+      - .secrets/db-user.env
+    environment:
+      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
+      - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
+      - SYMFONY__ENV__MAILER_HOST=127.0.0.1
+      - SYMFONY__ENV__MAILER_USER=~
+      - SYMFONY__ENV__MAILER_PASSWORD=~
+      - SYMFONY__ENV__FROM_EMAIL=wallabag@example.com
+      - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.bedlamzd.dev
+      - SYMFONY__ENV__SERVER_NAME="Wallabag"
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+      - SYMFONY__ENV__DATABASE_HOST=db
+      - SYMFONY__ENV__DATABASE_PORT=3306
+    volumes:
+      - images:/var/www/wallabag/web/assets/images
+    labels:
+      traefik.enable: true
+      traefik.docker.network: reproxy
+      traefik.http.services.wallabag-svc.loadbalancer.server.port: 80
+    depends_on:
+      - db
+      - redis
+    networks:
+      - default
+      - reproxy
+
+  db:
+    image: mariadb
+    restart: always
+    env_file: .secrets/db-root.env
+    volumes:
+      - db:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    restart: always
