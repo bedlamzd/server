@@ -1,3 +1,4 @@
+traefik/cert/
 .secrets/
 firefly-iii/db
 firefly-iii/upload
