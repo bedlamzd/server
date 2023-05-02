@@ -7,6 +7,8 @@ networks:
 secrets:
   cron_token:
     file: ./.secrets/cron_token
+  mapbox_key:
+    file: ./.secrets/mapbox_key
   app_key:
     file: ./.secrets/app_key
   db_name:
@@ -32,6 +34,7 @@ services:
     secrets:
       # used in .env file
       - app_key
+      - mapbox_key
       - cron_token
       - db_name
       - db_user
